@@ -1,6 +1,6 @@
 #include <file_system.h>
 
-bool container::good_object(const object& el) const noexcept
+bool file_system::good_object(const object& el) const noexcept
 {
     if(el.get_id() == el.get_id_p())
         return false;
@@ -31,7 +31,7 @@ bool container::good_object(const object& el) const noexcept
     return true;
 }
 
-void container::insert_m(type_a index, object& in_object) noexcept(false)
+void file_system::insert_m(type_a index, object& in_object) noexcept(false)
 {
     if(!good_object(in_object))
         throw std::runtime_error("bad name or id or id parrent or type parrent");
@@ -45,7 +45,7 @@ void container::insert_m(type_a index, object& in_object) noexcept(false)
     _objects[index] = std::move(in_object);
 }
 
-void container::insert_c(type_a index, const object& in_object) noexcept(false)
+void file_system::insert_c(type_a index, const object& in_object) noexcept(false)
 {
     if(!good_object(in_object))
         throw std::runtime_error("bad name or id or id parrent or type parrent");
@@ -60,7 +60,7 @@ void container::insert_c(type_a index, const object& in_object) noexcept(false)
     _objects[index] = in_object;
 }
 
-void container::remove_one(type_a index)
+void file_system::remove_one(type_a index)
 {
     if (index >= this->_size || index < 0 || (this->_size - 1 == -1))
         throw std::runtime_error("Index not value or massive size = 0");
@@ -70,7 +70,7 @@ void container::remove_one(type_a index)
         this->_objects[i].swap(this->_objects[i + 1]);
 }
 
-void container::create_file(type_a index, mstd::string name, type_i id, type_i id_p, type_s bytes)
+void file_system::create_file(type_a index, mstd::string name, type_i id, type_i id_p, type_s bytes)
 {
     this->insert_c(index, object(name, File, id, id_p, bytes));
     for(type_a i = 0; i < this->_size; ++i)
@@ -80,7 +80,7 @@ void container::create_file(type_a index, mstd::string name, type_i id, type_i i
 }
 
 //Вычисление размера обьекта
-type_s container::size_obj(type_a index)
+type_s file_system::size_obj(type_a index)
 {
     if (this->_objects[index].get_type() == Cataloge)
     {
@@ -107,13 +107,13 @@ type_s container::size_obj(type_a index)
     }
 }
 
-void container::create_cataloge(type_a index, mstd::string name, type_i id, type_i id_p)
+void file_system::create_cataloge(type_a index, mstd::string name, type_i id, type_i id_p)
 {
     this->insert_c(index, object(name, Cataloge, id, id_p, 0));
     this->_objects[index].set_bytes(size_obj(index));
 }
 
-void container::remove_all(type_a index)
+void file_system::remove_all(type_a index)
 {
     if (index >= this->_size || index < 0)
         throw std::runtime_error("Index not value or massive size = 0");
@@ -140,7 +140,7 @@ void container::remove_all(type_a index)
     }
 }
 
-std::ostream& operator<<(std::ostream& stream, container cont) noexcept
+std::ostream& operator<<(std::ostream& stream, file_system cont) noexcept
 {
     for(type_a i = 0; i < cont.get_size(); ++i)
     {

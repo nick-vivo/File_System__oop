@@ -18,6 +18,14 @@ target_include_directories(file_system PUBLIC "include")
 target_link_libraries(file_system object)
 
 #test.cpp
-add_executable(test test.cpp)
-target_include_directories(object PUBLIC "include" "modules/STL/include")
-target_link_libraries(test object)
+# add_executable(test test.cpp)
+# target_include_directories(object PUBLIC "include" "modules/STL/include")
+# target_link_libraries(test file_system)
+
+#tests
+add_subdirectory(tests/googletest)
+set(G_TESTSING gmock_main gmock gtest gtest_main)
+
+add_executable(g_test tests/g_test.cpp)
+target_include_directories(g_test PUBLIC "include" "tests/googletest/googlemock/include/gmock" "tests/googletest/googletest/include/gtest")
+target_link_libraries(g_test ${G_TESTSING} object file_system)

@@ -99,5 +99,14 @@ public:
     }
 };
 
+inline void object::swap(object &other) noexcept
+{
+    this->_name.swap(other._name);
+    mstd::swap<type_o>(this->_type, other._type);
+    mstd::swap<type_i>(this->_id, other._id);
+    mstd::swap<type_i>(this->_id_p, other._id_p);
+    mstd::swap<type_s>(this->_bytes, other._bytes);
+}
+
 std::ostream& operator<<(std::ostream& stream, object& cont) noexcept;
 #endif

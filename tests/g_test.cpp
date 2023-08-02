@@ -1,13 +1,13 @@
-#include "./gmock/gmock.h"
-#include "./gtest/gtest.h"
-#include "../include/source/container.cc"
-#include "../include/source/item.cc"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <object.h>
+#include <file_system.h>
 
 TEST(TEST__I, operator_and_swap)
 {
-    item a("123", File, 123, 123 ,123);
-    item b("1234", Cataloge, 1234, 1234, 1234);
-    item c("1234", Cataloge, 1234, 1234, 1234);
+    object a("123", File, 123, 123 ,123);
+    object b("1234", Cataloge, 1234, 1234, 1234);
+    object c("1234", Cataloge, 1234, 1234, 1234);
     b = a;
 
     ASSERT_EQ(b.get_bytes(), 123);
@@ -29,7 +29,7 @@ TEST(TEST__I, operator_and_swap)
     ASSERT_STREQ(b.get_name().c_str(), "1234");
     ASSERT_EQ(b.get_type(), Cataloge);
 
-    a = item("name", Object, 1234, 12345, 10);
+    a = object("name", Object, 1234, 12345, 10);
     ASSERT_TRUE(a != b);
     ASSERT_FALSE(a == b);
     a = b;
@@ -39,7 +39,7 @@ TEST(TEST__I, operator_and_swap)
 
 TEST(TEST_C, index)
 {
-    container a;
+    file_system a;
     ASSERT_ANY_THROW(a.at_r(0));
     ASSERT_ANY_THROW(a.at_r(1));
     ASSERT_ANY_THROW(a.at_r(-1));
@@ -106,7 +106,7 @@ TEST(TEST_C, index)
 
 TEST(TEST_C, Input)
 {
-    container cont;
+    file_system cont;
 
     ASSERT_ANY_THROW(cont.create_cataloge(0, "123", 123, 123));
     ASSERT_ANY_THROW(cont.create_file(0, "123", 123, 123, 20));
@@ -137,7 +137,7 @@ TEST(TEST_C, Input)
 
 TEST(TEST_C, REMOVE)
 {
-    container cont;
+    file_system cont;
     cont.create_file(0, "Nikita", 100, 0, 20);
     cont.create_cataloge(0, "Photo", 1, 0);
     cont.create_file(1, "program.cpp", 11, 1, 20);
@@ -148,5 +148,5 @@ TEST(TEST_C, REMOVE)
     cont.remove_all(0);
 
     ASSERT_EQ(cont.get_size(), 1);
-    ASSERT_TRUE(cont.at_r(0) == item("Nikita", File, 100, 0, 20));
+    ASSERT_TRUE(cont.at_r(0) == object("Nikita", File, 100, 0, 20));
 }

@@ -7,7 +7,7 @@
 #define _SIZE_ARRAY_STATIC 25
 typedef unsigned short type_a;              //for array
 
-class container
+class file_system
 {
 private:
 
@@ -15,9 +15,9 @@ object _objects[_SIZE_ARRAY_STATIC];
 type_a _size;
 
 public:
-    container(): _size(0) {}
+    file_system(): _size(0) {}
 
-    ~container() = default;
+    ~file_system() = default;
 
     inline type_a get_size() const noexcept
     {
@@ -93,6 +93,6 @@ public:
     }
 };
 
-std::ostream& operator<<(std::ostream& stream, container cont) noexcept;
+std::ostream& operator<<(std::ostream& stream, file_system cont) noexcept;
 
 #endif
