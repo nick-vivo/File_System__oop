@@ -2,18 +2,13 @@
 #define __OBJECT_H__
 #include <string.hpp> //библиотека string, своя
 #include <iostream>
+#include <tools.h>
 
 typedef int type_i;                 //id
 typedef unsigned short type_s;      //size
 enum type_o{Object, Cataloge, File};  //obj
 
-namespace mstd
-{
-template<typename T>
-inline void swap(T &a, T &b);
-}
-
-class item
+class object
 {
 private:
 
@@ -25,17 +20,17 @@ type_s _bytes;
 
 public:
 
-    item() = default;
-    item(const item& other) = default;
-    item(item&& other);
-    item(mstd::string name, type_o type, type_i id, type_i id_p, type_s bytes): _name(name), _type(type), _id(id), _id_p(id_p), _bytes(bytes) {}
-    item(const char* name, type_o type, type_i id, type_i id_p, type_s bytes): _name(name), _type(type), _id(id), _id_p(id_p), _bytes(bytes) {}
-    ~item() = default;
+    object() = default;
+    object(const object& other) = default;
+    object(object&& other);
+    object(mstd::string name, type_o type, type_i id, type_i id_p, type_s bytes): _name(name), _type(type), _id(id), _id_p(id_p), _bytes(bytes) {}
+    object(const char* name, type_o type, type_i id, type_i id_p, type_s bytes): _name(name), _type(type), _id(id), _id_p(id_p), _bytes(bytes) {}
+    ~object() = default;
 
 //Operators
-    item& operator=(const item& other) noexcept;
+    object& operator=(const object& other) noexcept;
 
-    void operator=(item&& other) noexcept;
+    void operator=(object&& other) noexcept;
 
 //Setters
 
@@ -91,18 +86,18 @@ public:
         return this->_bytes;
     }
 
-    inline void swap(item& other) noexcept;
+    inline void swap(object& other) noexcept;
 
-    bool operator==(const item& other) const noexcept
+    bool operator==(const object& other) const noexcept
     {
         return (this->_bytes == other._bytes) && (this->_id == other._id) && (this->_id_p == other._id_p) && (this->_name == other._name) && (this->_type == other._type);
     }
 
-    bool operator!=(const item& other) const noexcept
+    bool operator!=(const object& other) const noexcept
     {
         return !this->operator==(other);
     }
 };
 
-std::ostream& operator<<(std::ostream& stream, item& cont) noexcept;
+std::ostream& operator<<(std::ostream& stream, object& cont) noexcept;
 #endif
