@@ -13,7 +13,7 @@ private:
 
 type_a _capacity;
 type_a _size;
-object *_objects;
+object **_objects;
 
 public:
     file_system();
@@ -39,18 +39,17 @@ public:
     {        
         if(index >= this->_size || index < 0)
             throw std::runtime_error("index bad value");
-        return _objects[index];
+        return *_objects[index];
     }
 //Получить обьект по индексу в режиме чтения
     inline object at_r(type_a index) const noexcept(false)
     {
         if(index >= this->_size || index < 0)
             throw std::runtime_error("index bad value");
-        return _objects[index];
+        return *_objects[index];
     }
 
 private:
-    void insert_m(type_a index, object& in_object) noexcept(false);
 
     void insert_c(type_a index, const object& in_object) noexcept(false);
 
@@ -77,7 +76,7 @@ public:
         {
             throw std::runtime_error("index bad value");
         }
-        return this->_objects[index].get_bytes();
+        return this->_objects[index]->get_bytes();
     }
 
 //Поиск в наборе обьекта с укзанным id
@@ -85,8 +84,8 @@ public:
     {
         for(type_a i = 0; i < this->_size; ++i)
         {
-            if (this->_objects[i].get_id() == id)
-                return this->_objects[i];
+            if (this->_objects[i]->get_id() == id)
+                return *this->_objects[i];
         }
         throw std::runtime_error("not found");
     }
