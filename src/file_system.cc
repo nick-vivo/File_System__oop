@@ -1,13 +1,31 @@
 #include <file_system.h>
 
+file_system::file_system(): _capacity(0), _objects(nullptr), _size(0) {}
+
+    file_system::file_system(const type_a capacity): _capacity(capacity), _objects(new object[_capacity]), _size(0) {}
+
+    file_system::file_system(const file_system& other): _capacity(other._capacity), _size(other._size), _objects(new object[_capacity])
+    {
+        for(type_a i = 0; i < this->_size; ++i)
+        {
+            this->_objects[i] = other._objects[i];
+        }
+    }
+
+    file_system::~file_system()
+    {
+        if(_objects)
+        {
+            delete[] _objects;
+        }
+    }
+
 bool file_system::good_object(const object& el) const noexcept
 {
     if(el.get_id() == el.get_id_p())
         return false;
-        
     if(el.get_bytes() < 0)
         return false;
-        
     for(type_a i = 0; i < this->_size; ++i)
     {
         if (this->_objects[i].get_id() == el.get_id())
@@ -36,9 +54,26 @@ void file_system::insert_m(type_a index, object& in_object) noexcept(false)
     if(!good_object(in_object))
         throw std::runtime_error("bad name or id or id parrent or type parrent");
 
-    if (index > this->_size || index < 0 || this->_size + 1 > _SIZE_ARRAY_STATIC)
+    if (index > this->_size || index < 0)
         throw std::runtime_error("index bad value or array is full");
     
+    if (this->_size + 1 > this->_capacity)
+    {
+        file_system cp(*this);
+        while(this->_size + 1 > this->_capacity)
+        {
+            this->_capacity += __CONST_FOR_CAPACITY;
+        }
+
+        this->~file_system();
+        this->_objects = new object[this->_capacity];
+
+        for(type_a i = 0; i < this->_size; ++i)
+        {
+            this->_objects[i] = cp._objects[i];
+        }
+    }
+
     for (type_a i = _size; i != index; --i)
         _objects[i].swap(_objects[i - 1]);
     ++this->_size;
@@ -50,8 +85,25 @@ void file_system::insert_c(type_a index, const object& in_object) noexcept(false
     if(!good_object(in_object))
         throw std::runtime_error("bad name or id or id parrent or type parrent");
     
-    if (index > this->_size || index < 0 || this->_size + 1 > _SIZE_ARRAY_STATIC)
-        throw std::runtime_error("index bad value or array is full");
+    if (index > this->_size || index < 0)
+        throw std::runtime_error("index bad value");
+
+    if (this->_size + 1 > this->_capacity)
+    {
+        file_system cp(*this);
+        while(this->_size + 1 > this->_capacity)
+        {
+            this->_capacity += __CONST_FOR_CAPACITY;
+        }
+
+        this->~file_system();
+        this->_objects = new object[this->_capacity];
+
+        for(type_a i = 0; i < this->_size; ++i)
+        {
+            this->_objects[i] = cp._objects[i];
+        }
+    }
 
     for (type_a i = _size; i != index; --i)
         _objects[i].swap(_objects[i - 1]);
@@ -138,7 +190,21 @@ void file_system::remove_all(type_a index)
     {
         this->_objects[i].set_bytes(size_obj(i));
     }
-}
+
+    if(this->_size < this->_capacity - __CONST_FOR_CAPACITY)
+    {
+        file_system cp(*this);
+        while(this->_size < this->_capacity - __CONST_FOR_CAPACITY)
+            --this->_capacity;
+        this->~file_system();
+        this->_objects = new object[this->_capacity];
+        for (type_a i = 0; i < this->_size; ++i)
+        {
+            this->_objects[i] = cp._objects[i];
+        }
+    }
+    
+} 
 
 std::ostream& operator<<(std::ostream& stream, file_system cont) noexcept
 {
@@ -163,4 +229,3 @@ std::ostream& operator<<(std::ostream& stream, file_system cont) noexcept
     }
     return stream;
 }
-

@@ -4,20 +4,31 @@
 #include <object.h>
 #include <iostream>
 #include <exception>
-#define _SIZE_ARRAY_STATIC 25
-typedef unsigned short type_a;              //for array
+typedef int type_a;              //for array
 
+#define __CONST_FOR_CAPACITY 5
 class file_system
 {
 private:
 
-object _objects[_SIZE_ARRAY_STATIC];
+type_a _capacity;
 type_a _size;
+object *_objects;
 
 public:
-    file_system(): _size(0) {}
+    file_system();
 
-    ~file_system() = default;
+//Сразу выделить память под capacity обьектов
+    file_system(const type_a capacity);
+
+    file_system(const file_system& other);
+
+    ~file_system();
+
+    inline type_a capacity() const noexcept
+    {
+        return this->_capacity;
+    }
 
     inline type_a get_size() const noexcept
     {
@@ -77,7 +88,7 @@ public:
             if (this->_objects[i].get_id() == id)
                 return this->_objects[i];
         }
-        throw std::runtime_error("index bad value");
+        throw std::runtime_error("not found");
     }
 //Построение абсолютного пути обьекта с указанным индефикатором
     mstd::string path(const type_i id)
