@@ -1,8 +1,8 @@
-#ifndef __MENU_HPP__
-#define __MENU_HPP__
+#ifndef __MENU_H__
+#define __MENU_H__
 
-#include "../../../libs/include/source/exception"
-#include "../../../libs/include/source/string"
+#include <exception>
+#include <string.hpp>
 #include <iostream>
 #include <stdio.h>
 //Для работы с терминалом
@@ -52,7 +52,7 @@
 
 //END EXAMPLE
 
-namespace my
+namespace mstd
 {
 template<typename T>
 class point
@@ -117,16 +117,16 @@ typedef unsigned short type_p; // position
 class button
 {
 protected:
-    my::string name;
+    mstd::string name;
     point<type_p> _position;
 public:
     button() {};
 
-    button(my::button& other): name(other.name), _position(other._position) {}
+    button(mstd::button& other): name(other.name), _position(other._position) {}
 
-    button(my::string name, point<type_p> position): name(name), _position(position) {}
+    button(mstd::string name, point<type_p> position): name(name), _position(position) {}
     
-    my::string get_name() const noexcept
+    mstd::string get_name() const noexcept
     {
         return name;
     }
@@ -141,7 +141,7 @@ public:
         return _position;
     }
 
-    void set_name(my::string name) noexcept
+    void set_name(mstd::string name) noexcept
     {
         this->name = name;
     }
@@ -161,7 +161,7 @@ public:
 std::ostream& operator<<(std::ostream& stream, button butt)
 {
     gotoxy(butt.get_position().get_x(),butt.get_position().get_y());
-    stream << butt.get_name();
+    stream << butt.get_name().c_str();
     return stream;
 }
 
@@ -204,15 +204,15 @@ public:
     int& now_button()
     {
         if(this->_now_button >= this->size || this->_now_button < 0)
-            throw my::exception("now_button is fail");
+            throw std::runtime_error("now_button is fail");
         return this->_now_button;
     }
 
-    void create_button(my::string name)
+    void create_button(mstd::string name)
     {
         if(size + 1 > this->_capacity)
         {
-            throw my::exception("array is full");
+            throw std::runtime_error("array is full");
         }
         this->_buttons[size].set_name(name);
         this->_buttons[size].x() = this->_win.ws_col/2 - _buttons[this->size].get_name().size()/2;
@@ -225,7 +225,7 @@ public:
 
         if(index_button_on >= size || index_button_on < 0)
         {
-            throw my::exception("bad index");
+            throw std::runtime_error("bad index");
         }
 
         for(type_c i = 0; i < this->size; ++i)
@@ -238,7 +238,7 @@ public:
                 gotoxy(this->_buttons[i].get_position().get_x()-3,this->_buttons[i].get_position().get_y());
                 std::cout << ">> ";
             }
-            std::cout << this->_buttons[i].get_name();
+            std::cout << this->_buttons[i].get_name().c_str();
             if(index_button_on == i)
             {
                 resetcolor();

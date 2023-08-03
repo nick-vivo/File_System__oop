@@ -8,12 +8,6 @@ typedef int type_i;                 //id
 typedef unsigned short type_s;      //size
 enum type_o{Object, Cataloge, File};  //obj
 
-namespace mstd
-{
-template<typename T>
-inline void swap(T &a, T &b);
-}
-
 class object
 {
 private:
@@ -104,6 +98,15 @@ public:
         return !this->operator==(other);
     }
 };
+
+inline void object::swap(object &other) noexcept
+{
+    this->_name.swap(other._name);
+    mstd::swap<type_o>(this->_type, other._type);
+    mstd::swap<type_i>(this->_id, other._id);
+    mstd::swap<type_i>(this->_id_p, other._id_p);
+    mstd::swap<type_s>(this->_bytes, other._bytes);
+}
 
 std::ostream& operator<<(std::ostream& stream, object& cont) noexcept;
 #endif

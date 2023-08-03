@@ -1,7 +1,7 @@
 #include <iostream>
-#include "./menu/menu.cc"
-#include "./include/source/container.cc"
-#include "../../libs/include/source/string"
+#include <menu.cc>
+#include <file_system.h>
+#include <string.hpp>
 
 #define music std::cout<<'\a';
 void playposition(char &key, int &now_button, bool &flag)
@@ -39,10 +39,10 @@ void playposition(char &key, int &now_button, bool &flag)
 
 int main()
 {
-    container cont;
+    file_system cont;
 
     char key;
-    my::menu menu_1(6);
+    mstd::menu menu_1(6);
     menu_1.create_button("1. Вставить элемент по индексу");
     menu_1.create_button("2. Удалить элемент по индексу");
     menu_1.create_button("3. Вывести список на экран");
@@ -57,12 +57,13 @@ int main()
     bool fl = true;
 
     type_a i;
-    my::string name;
+    char name[50];
+    mstd::string two_name;
     type_i id;
     type_i id_parent;
-    my::string type;
+    char type[50];
     type_s bytes;
-    item b;
+    object b;
 
     cont.create_cataloge(0, "Cataloge 1", 1, 1000);
     cont.create_cataloge(1, "Cataloge 2", 2, 1000);
@@ -102,14 +103,15 @@ int main()
                     std::cin >> id_parent;
                     std::cout << "\n\"file\" или \"cataloge\"?: ";
                     std::cin >> type;
+                    two_name = type;
 
-                    if (type == "file")
+                    if (two_name == "file")
                     {
                         std::cout << "\nРазмер в байтах:  ";
                         std::cin >> bytes;
                         cont.create_file(i, name, id, id_parent, bytes);
                     }
-                    else if(type == "cataloge")
+                    else if(two_name == "cataloge")
                     {
                         cont.create_cataloge(i, name, id, id_parent);
                     }
@@ -143,8 +145,15 @@ int main()
                     std::cout << "Введи id для поиска: ";
                     std::cin >> id;
                     std::cout << std::endl;
-                    b = cont.search_id(id); 
-                    std::cout << b;
+                    try
+                    {
+                        b = cont.search_id(id);
+                        std::cout << b;
+                    }
+                    catch(...)
+                    {
+                        std::cout << "not found";
+                    } 
                     std::cout << std::endl << "\nEnter for contine...";
                     getchar();
                     getchar();
@@ -155,7 +164,7 @@ int main()
                     std::cout << "Введи айди: ";
                     std::cin >> id;
                     std::cout << std::endl;
-                    std::cout << cont.path(id);
+                    std::cout << cont.path(id).c_str();
                     std::cout << std::endl << "Enter for contine...";
                     getchar();
                     getchar();
