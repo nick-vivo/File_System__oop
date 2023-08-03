@@ -3,16 +3,15 @@
 #include <string.hpp> //библиотека string, своя
 #include <iostream>
 #include <tools.h>
+#include <memory>
 
 typedef int type_i;                 //id
 typedef unsigned short type_s;      //size
-enum type_o{Object, Cataloge, File};  //obj
 
 class object
 {
-private:
+protected:
 
-type_o _type;
 mstd::string _name;
 type_i _id;
 type_i _id_p;
@@ -22,22 +21,14 @@ public:
 
     object() = default;
     object(const object& other) = default;
-    object(object&& other);
-    object(mstd::string name, type_o type, type_i id, type_i id_p, type_s bytes): _name(name), _type(type), _id(id), _id_p(id_p), _bytes(bytes) {}
-    object(const char* name, type_o type, type_i id, type_i id_p, type_s bytes): _name(name), _type(type), _id(id), _id_p(id_p), _bytes(bytes) {}
-    ~object() = default;
+    object(mstd::string name, type_i id, type_i id_p, type_s bytes): _name(name), _id(id), _id_p(id_p), _bytes(bytes) {}
+    object(const char* name, type_i id, type_i id_p, type_s bytes): _name(name), _id(id), _id_p(id_p), _bytes(bytes) {}
+    virtual ~object() = default;
 
 //Operators
     object& operator=(const object& other) noexcept;
 
-    void operator=(object&& other) noexcept;
-
 //Setters
-
-    inline void set_type(type_o type) noexcept
-    {
-        this->_type = type;
-    }
 
     inline void set_name(mstd::string name) noexcept
     {
@@ -61,11 +52,6 @@ public:
 
 //Getters
 
-    inline type_o get_type() const noexcept
-    {
-        return this->_type;
-    }
-
     inline mstd::string get_name() const noexcept
     {
         return this->_name;
@@ -86,27 +72,64 @@ public:
         return this->_bytes;
     }
 
-    inline void swap(object& other) noexcept;
-
+    inline void swap(object& other) noexcept
+    {
+        this->_name.swap(other._name);
+        mstd::swap<type_i>(this->_id, other._id);
+        mstd::swap<type_i>(this->_id_p, other._id_p);
+        mstd::swap<type_s>(this->_bytes, other._bytes);
+    }
     bool operator==(const object& other) const noexcept
     {
-        return (this->_bytes == other._bytes) && (this->_id == other._id) && (this->_id_p == other._id_p) && (this->_name == other._name) && (this->_type == other._type);
+        return (this->_bytes == other._bytes) && (this->_id == other._id) && (this->_id_p == other._id_p) && (this->_name == other._name);
     }
 
     bool operator!=(const object& other) const noexcept
     {
         return !this->operator==(other);
     }
+
+    virtual void print(std::ostream& stream) const = 0;
+
+    virtual inline bool is_file() const noexcept = 0;
+
+    virtual std::unique_ptr<object> clone() const  = 0;
+
 };
 
-inline void object::swap(object &other) noexcept
+class file: public object
 {
-    this->_name.swap(other._name);
-    mstd::swap<type_o>(this->_type, other._type);
-    mstd::swap<type_i>(this->_id, other._id);
-    mstd::swap<type_i>(this->_id_p, other._id_p);
-    mstd::swap<type_s>(this->_bytes, other._bytes);
+public:
+    file() = default;
+    file(mstd::string name, type_i id, type_i id_p, type_s bytes): object(name, id, id_p, bytes) {}
+    file(const char* name, type_i id, type_i id_p, type_s bytes): object(name, id, id_p, bytes) {}
+
+    void print(std::ostream& stream) const override;
+    inline bool is_file() const noexcept override;
+    std::unique_ptr<object> clone() const override;
+};
+
+inline bool file::is_file() const noexcept
+{
+    return true;
 }
 
-std::ostream& operator<<(std::ostream& stream, object& cont) noexcept;
+class cataloge: public object
+{
+public:
+    cataloge() = default;
+    cataloge(mstd::string name, type_i id, type_i id_p, type_s bytes): object(name, id, id_p, bytes) {}
+    cataloge(const char* name, type_i id, type_i id_p, type_s bytes): object(name, id, id_p, bytes) {}
+
+    void print(std::ostream& stream) const override;
+    inline bool is_file() const noexcept override;
+    std::unique_ptr<object> clone() const override;
+};
+
+inline bool cataloge::is_file() const noexcept
+{
+    return false;
+}
+
+
 #endif

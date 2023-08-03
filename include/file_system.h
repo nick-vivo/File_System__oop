@@ -4,49 +4,34 @@
 #include <object.h>
 #include <iostream>
 #include <exception>
+#include <memory>
+#include <vector>
+
 typedef int type_a;              //for array
 
-#define __CONST_FOR_CAPACITY 5
 class file_system
 {
 private:
 
-type_a _capacity;
-type_a _size;
-object **_objects;
+std::vector< std::unique_ptr<object> > _vector;
 
 public:
-    file_system();
-
-//Сразу выделить память под capacity обьектов
-    file_system(const type_a capacity);
+    file_system() = default;
 
     file_system(const file_system& other);
 
-    ~file_system();
-
-    inline type_a capacity() const noexcept
-    {
-        return this->_capacity;
-    }
+    ~file_system() = default;
 
     inline type_a get_size() const noexcept
     {
-        return this->_size;
+        return this->_vector.size();
     }
 
-    inline object operator[](type_a index) const noexcept(false)
+    inline std::unique_ptr<object> operator[](type_a index) const noexcept(false)
     {        
-        if(index >= this->_size || index < 0)
+        if(index >= this->_vector.size() || index < 0)
             throw std::runtime_error("index bad value");
-        return *_objects[index];
-    }
-//Получить обьект по индексу в режиме чтения
-    inline object at_r(type_a index) const noexcept(false)
-    {
-        if(index >= this->_size || index < 0)
-            throw std::runtime_error("index bad value");
-        return *_objects[index];
+        return _vector[index]->clone();
     }
 
 private:
@@ -72,33 +57,44 @@ public:
 //Узнать размер обьекта системы
     type_s get_bytes(const type_a index) const noexcept(false)
     {
-        if(index >= this->_size || index < 0)
+        if(index >= this->_vector.size() || index < 0)
         {
             throw std::runtime_error("index bad value");
         }
-        return this->_objects[index]->get_bytes();
+        return this->_vector[index]->get_bytes();
     }
 
 //Поиск в наборе обьекта с укзанным id
-    object search_id(const type_i id) const
+    std::unique_ptr<object> search_id(const type_i id) const
     {
-        for(type_a i = 0; i < this->_size; ++i)
+        for(type_a i = 0; i < this->_vector.size(); ++i)
         {
-            if (this->_objects[i]->get_id() == id)
-                return *this->_objects[i];
+            if (this->_vector[i]->get_id() == id)
+                return this->_vector[i]->clone();
         }
         throw std::runtime_error("not found");
     }
+
 //Построение абсолютного пути обьекта с указанным индефикатором
     mstd::string path(const type_i id)
     {
         try
         {
-            return path(search_id(id).get_id_p()) + "/" + search_id(id).get_name();
+            return path(search_id(id)->get_id_p()) + "/" + search_id(id)->get_name();
         }
         catch(const std::runtime_error& e)
         {
             return "~";
+        }
+    }
+
+    void print(std::ostream& stream) const 
+    {
+        for(type_a i = 0; i < this->_vector.size(); ++i)
+        {
+            stream << "\nindex: " << i;
+            this->_vector[i]->print(stream);
+            stream << std::endl;
         }
     }
 };

@@ -57,13 +57,14 @@ int main()
     bool fl = true;
 
     type_a i;
-    char name[50];
-    mstd::string two_name;
+    mstd::string name;
+    char tmp_name[50];
     type_i id;
     type_i id_parent;
-    char type[50];
+    mstd::string type;
+    char tmp_type[50];
     type_s bytes;
-    object b;
+    object* b;
 
     cont.create_cataloge(0, "Cataloge 1", 1, 1000);
     cont.create_cataloge(1, "Cataloge 2", 2, 1000);
@@ -96,22 +97,23 @@ int main()
                     std::cin >> i;
                     std::cout << "\nВведи имя обьекта: ";
         
-                    std::cin >> name;
+                    std::cin >> tmp_name;
+                    name = tmp_name;
                     std::cout << "\nВведи id обьекта: ";
                     std::cin >> id;
                     std::cout << "\nВведи id_parent обьекта: ";
                     std::cin >> id_parent;
                     std::cout << "\n\"file\" или \"cataloge\"?: ";
-                    std::cin >> type;
-                    two_name = type;
+                    std::cin >> tmp_type;
+                    type = tmp_type;
 
-                    if (two_name == "file")
+                    if (type == "file")
                     {
                         std::cout << "\nРазмер в байтах:  ";
                         std::cin >> bytes;
                         cont.create_file(i, name, id, id_parent, bytes);
                     }
-                    else if(two_name == "cataloge")
+                    else if(type == "cataloge")
                     {
                         cont.create_cataloge(i, name, id, id_parent);
                     }
@@ -134,7 +136,7 @@ int main()
                 }
                 case 2:
                 {
-                    std::cout << cont;
+                    cont.print(std::cout);
                     std::cout << std::endl << "Enter for contine...";
                     getchar();
                     getchar();
@@ -147,13 +149,12 @@ int main()
                     std::cout << std::endl;
                     try
                     {
-                        b = cont.search_id(id);
-                        std::cout << b;
+                        cont.search_id(id)->print(std::cout);
                     }
                     catch(...)
                     {
                         std::cout << "not found";
-                    } 
+                    }
                     std::cout << std::endl << "\nEnter for contine...";
                     getchar();
                     getchar();

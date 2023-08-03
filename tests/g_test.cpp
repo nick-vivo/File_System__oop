@@ -2,47 +2,48 @@
 #include <gtest/gtest.h>
 #include <object.h>
 #include <file_system.h>
+#include <memory>
 
 TEST(TEST__I, operator_and_swap)
 {
-    object a("123", File, 123, 123 ,123);
-    object b("1234", Cataloge, 1234, 1234, 1234);
-    object c("1234", Cataloge, 1234, 1234, 1234);
-    b = a;
+    file a("123", 123, 123 ,123);
+    cataloge b("1234", 1234, 1234, 1234);
+    cataloge c("1234", 1234, 1234, 1234);
+    
+    std::unique_ptr<object> d = a.clone();
 
+    ASSERT_EQ(d->get_bytes(), 123);
+    ASSERT_EQ(d->get_id(), 123);
+    ASSERT_EQ(d->get_id_p(), 123);
+    ASSERT_STREQ(d->get_name().c_str(), "123");
+    ASSERT_EQ(d->is_file(), 1);
+
+    a.swap(b);
     ASSERT_EQ(b.get_bytes(), 123);
     ASSERT_EQ(b.get_id(), 123);
     ASSERT_EQ(b.get_id_p(), 123);
     ASSERT_STREQ(b.get_name().c_str(), "123");
-    ASSERT_EQ(b.get_type(), File);
 
-    b.swap(c);
-    ASSERT_EQ(c.get_bytes(), 123);
-    ASSERT_EQ(c.get_id(), 123);
-    ASSERT_EQ(c.get_id_p(), 123);
-    ASSERT_STREQ(c.get_name().c_str(), "123");
-    ASSERT_EQ(c.get_type(), File);
+    ASSERT_EQ(a.get_bytes(), 1234);
+    ASSERT_EQ(a.get_id(), 1234);
+    ASSERT_EQ(a.get_id_p(), 1234);
+    ASSERT_STREQ(a.get_name().c_str(), "1234");
 
-    ASSERT_EQ(b.get_bytes(), 1234);
-    ASSERT_EQ(b.get_id(), 1234);
-    ASSERT_EQ(b.get_id_p(), 1234);
-    ASSERT_STREQ(b.get_name().c_str(), "1234");
-    ASSERT_EQ(b.get_type(), Cataloge);
+    a.swap(b);
 
-    a = object("name", Object, 1234, 12345, 10);
     ASSERT_TRUE(a != b);
     ASSERT_FALSE(a == b);
-    a = b;
-    ASSERT_TRUE(a != c);
-    ASSERT_FALSE(a == c);
+
+    ASSERT_TRUE(b == c);
+    ASSERT_FALSE(b != c);
 }
 
 TEST(TEST_C, index)
 {
     file_system a;
-    ASSERT_ANY_THROW(a.at_r(0));
-    ASSERT_ANY_THROW(a.at_r(1));
-    ASSERT_ANY_THROW(a.at_r(-1));
+    ASSERT_ANY_THROW(a[0]);
+    ASSERT_ANY_THROW(a[1]);
+    ASSERT_ANY_THROW(a[-1]);
     
     ASSERT_ANY_THROW(a[-1]);
     ASSERT_ANY_THROW(a[0]);
@@ -75,33 +76,33 @@ TEST(TEST_C, index)
 
     ASSERT_EQ(a.get_size(), 2);
 
-    ASSERT_EQ(a[0].get_bytes(), 0);
-    ASSERT_EQ(a[0].get_id(), 1234);
-    ASSERT_EQ(a[0].get_id_p(),12);
-    ASSERT_EQ(a[0].get_type(), Cataloge);
-    ASSERT_STREQ(a[0].get_name().c_str(), "123");
+    ASSERT_EQ(a[0]->get_bytes(), 0);
+    ASSERT_EQ(a[0]->get_id(), 1234);
+    ASSERT_EQ(a[0]->get_id_p(),12);
+    ASSERT_EQ(a[0]->is_file(), 0);
+    ASSERT_STREQ(a[0]->get_name().c_str(), "123");
 
-    ASSERT_EQ(a[1].get_bytes(), 123);
-    ASSERT_EQ(a[1].get_id(), 123);
-    ASSERT_EQ(a[1].get_id_p(),12);
-    ASSERT_EQ(a[1].get_type(), File);
-    ASSERT_STREQ(a[1].get_name().c_str(), "123");
+    ASSERT_EQ(a[1]->get_bytes(), 123);
+    ASSERT_EQ(a[1]->get_id(), 123);
+    ASSERT_EQ(a[1]->get_id_p(),12);
+    ASSERT_EQ(a[1]->is_file(), 1);
+    ASSERT_STREQ(a[1]->get_name().c_str(), "123");
 
     ASSERT_NO_THROW(a.get_bytes(0));
     
     ASSERT_NO_THROW(a.remove_all(0));
-    ASSERT_EQ(a[0].get_bytes(), 123);
-    ASSERT_EQ(a[0].get_id(), 123);
-    ASSERT_EQ(a[0].get_id_p(),12);
-    ASSERT_EQ(a[0].get_type(), File);
-    ASSERT_STREQ(a[0].get_name().c_str(), "123");
+    ASSERT_EQ(a[0]->get_bytes(), 123);
+    ASSERT_EQ(a[0]->get_id(), 123);
+    ASSERT_EQ(a[0]->get_id_p(),12);
+    ASSERT_EQ(a[0]->is_file(), 1);
+    ASSERT_STREQ(a[0]->get_name().c_str(), "123");
 
     ASSERT_NO_THROW(a.create_file(1, "123", 12345, 0, 123));
-    ASSERT_EQ(a[1].get_bytes(), 123);
-    ASSERT_EQ(a[1].get_id(), 12345);
-    ASSERT_EQ(a[1].get_id_p(),0);
-    ASSERT_EQ(a[1].get_type(), File);
-    ASSERT_STREQ(a[1].get_name().c_str(), "123");
+    ASSERT_EQ(a[1]->get_bytes(), 123);
+    ASSERT_EQ(a[1]->get_id(), 12345);
+    ASSERT_EQ(a[1]->get_id_p(),0);
+    ASSERT_EQ(a[1]->is_file(), 1);
+    ASSERT_STREQ(a[1]->get_name().c_str(), "123");
 }
 
 TEST(TEST_C, Input)
@@ -148,5 +149,6 @@ TEST(TEST_C, REMOVE)
     cont.remove_all(0);
 
     ASSERT_EQ(cont.get_size(), 1);
-    ASSERT_TRUE(cont.at_r(0) == object("Nikita", File, 100, 0, 20));
+    
+    ASSERT_TRUE(*cont[0]->clone() == file("Nikita", 100, 0, 20));
 }
